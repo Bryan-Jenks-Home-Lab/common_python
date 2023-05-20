@@ -1,13 +1,12 @@
 # TODO flesh out a pushover class that is used for common purposes to send notifs for other apps
 
-import base64
 import datetime
 import time
 from dataclasses import dataclass, field
 from enum import Enum
 
 import requests
-from pydantic import AnyUrl, BaseModel, BaseSettings, EmailStr, constr
+from pydantic import AnyUrl
 
 
 class AttachmentFileTypes(str, Enum):
@@ -24,9 +23,9 @@ class Pushover:
 
     token: str
     user: str
-    html: int = 1
     title: str
     message: str
+    html: int = 1
     sound: str = "falling"
     timestamp: float = time.mktime(datetime.datetime.now().timetuple())
     priority: int = 0
@@ -37,8 +36,8 @@ class Pushover:
     attachment_name: str = None
     attachment: bytes = None
 
-    def send_pushover_notification(self):
+    def send_notification(self):
         """Send a pushover notification using the Pushover API"""
         url = "https://api.pushover.net/1/messages.json"
-        data = self.__dict__()
+        data = self.__dict__
         return requests.post(url, data)
