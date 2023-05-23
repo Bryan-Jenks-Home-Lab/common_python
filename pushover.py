@@ -1,8 +1,9 @@
 # TODO flesh out a pushover class that is used for common purposes to send notifs for other apps
 
+import base64
 import datetime
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 
 import requests
@@ -36,8 +37,28 @@ class Pushover:
     attachment_name: str = None
     attachment: bytes = None
 
+    def __post_init__(self):
+        if self.attachment_name:
+            file_ext = self.attachment_name.split(".")[-1].upper()
+            conditions = [
+                self.attachment_name is not None,
+                self.attachment is not None,
+                hasattr(AttachmentFileTypes, file_ext),
+            ]
+
+            if all(conditions):
+                file_attachment = {
+                    "attachment": (
+                        self.attachment_name,
+                        base64.b64decode(self.attachment),
+                        file_ext,
+                    )
+                }
+        self.files = file_attachment if self.attachment_name is not None else None
+
     def send_notification(self):
         """Send a pushover notification using the Pushover API"""
         url = "https://api.pushover.net/1/messages.json"
         data = self.__dict__
-        return requests.post(url, data)
+        data.pop("attachment")
+        return requests.post(url, data, self.files)
