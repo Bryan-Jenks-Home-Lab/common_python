@@ -38,13 +38,13 @@ class Pushover:
     def __post_init__(self):
         if self.attachment_name:
             file_ext = self.attachment_name.split(".")[-1].upper()
-            conditions = [
+            conditions_are_true = [
                 self.attachment_name is not None,
                 self.attachment is not None,
                 hasattr(AttachmentFileTypes, file_ext),
             ]
 
-            if all(conditions):
+            if all(conditions_are_true):
                 file_attachment = {
                     "attachment": (
                         self.attachment_name,
